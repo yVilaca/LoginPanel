@@ -10,6 +10,9 @@ import {
 import { IconArrowRight } from "@tabler/icons-react";
 import { useState } from "react";
 import { useForm } from "@mantine/form";
+import axios from "axios";
+import { notifications } from "@mantine/notifications";
+import { redirect } from "react-router-dom";
 
 export default function Login() {
   const [register, setRegister] = useState(false);
@@ -39,12 +42,47 @@ export default function Login() {
             : "Confirme a senha"
           : null,
     },
+    transformValues: (values) => ({
+      email: values.email,
+      username: values.email,
+      password: values.senha,
+    }),
   });
+  function login() {
+    axios
+      .post(
+        register
+          ? "http://127.0.0.1:8000/api/users/register/"
+          : "http://127.0.0.1:8000/api/users/token/",
+        form.getTransformedValues()
+      )
+      .then((e) => {
+        notifications.show({
+          title: "Login Efetuado com sucesso!",
+          message: "Você se autenticou corretamente.",
+          position: "top-right",
+        });
+        sessionStorage.setItem("JWT", e.data.access);
+        sessionStorage.setItem("JWT_REFRESH", e.data.refresh);
+        redirect("/home");
+      })
+      .catch((error) => {
+        console.log(error);
+        notifications.show({
+          title: "Credenciais inválidas!",
+          message: register
+            ? `${error.response.data.error}`
+            : "Verifique os dados e tente novamente.",
+          position: "top-right",
+          color: "red",
+        });
+      });
+  }
 
   return (
     <Center h={"100vh"}>
       <Card shadow="md" withBorder>
-        <form onSubmit={form.onSubmit((values) => console.log(values))}>
+        <form onSubmit={form.onSubmit(() => login())}>
           <TextInput
             label="E-mail"
             placeholder="Digite seu e-mail"

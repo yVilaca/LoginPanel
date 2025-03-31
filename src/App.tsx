@@ -1,15 +1,25 @@
-import { Button, MantineProvider } from "@mantine/core";
-import { notifications, Notifications } from "@mantine/notifications";
+import { MantineProvider } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import { theme } from "./theme";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 import Login from "./Pages/Login";
+import Home from "./Pages/Home";
 
 export default function App() {
   return (
     <MantineProvider theme={theme}>
       <Notifications />
-      <Login />
+      <BrowserRouter>
+        <Routes>
+          <Route>
+            <Route index element={<Login />} />
+            <Route path="/home" element={<Home />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </MantineProvider>
   );
 }
